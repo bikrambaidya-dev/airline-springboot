@@ -1,0 +1,37 @@
+# services:
+#   mysql:
+#     image: mysql:8.0
+#     container_name: airline-mysql
+#     environment:
+#       MYSQL_DATABASE: airline_db
+#       MYSQL_USER: airline_user
+#       MYSQL_PASSWORD: airline_pass
+#       MYSQL_ROOT_PASSWORD: rootpass
+#     ports:
+#       - "3306:3306"
+#     volumes:
+#       - mysql_data:/var/lib/mysql
+#     healthcheck:
+#       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 10
+
+#   app:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     container_name: airline-app
+#     depends_on:
+#       mysql:
+#         condition: service_healthy
+#     environment:
+#       DB_URL: jdbc:mysql://mysql:3306/airline_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+#       DB_USERNAME: airline_user
+#       DB_PASSWORD: airline_pass
+#       PORT: 8080
+#     ports:
+#       - "8080:8080"
+
+# volumes:
+#   mysql_data:
