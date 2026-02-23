@@ -8,4 +8,6 @@ import com.airline.airline.entity.Airport;
 @Repository
 public interface AirportRepository extends JpaRepository<Airport, Long> {
     boolean existsByCodeIgnoreCase(String code);
+
+    boolean existsByCodeIgnoreCaseAndIdNot(String code, Long id);
 }

@@ -65,4 +65,33 @@ public class AirportService {
         }
         return code.trim().toUpperCase();
     }
+
+    @Transactional
+    public AirportResponse updateAirport(AirportRequest req) {
+        if (req.getId() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Airport id is required for update");
+        }
+
+        Airport airport = airportRepository.findById(req.getId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Airport not found"));
+
+        String normalizedCode = normalizeAirportCode(req.getCode());
+        if (airportRepository.existsByCodeIgnoreCaseAndIdNot(normalizedCode, req.getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Airport code already exists: " + normalizedCode);
+        }
+
+        airport.setCode(normalizedCode);
+        airport.setName(req.getName());
+        airport.setCity(req.getCity());
+        airport.setCountry(req.getCountry());
+
+        Airport saved = airportRepository.save(airport);
+        return toResponse(saved);
+    }
 }
