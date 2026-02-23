@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.airline.airline.dto.request.SeatRequest;
 import com.airline.airline.dto.response.ApiResponse;
 import com.airline.airline.entity.Seat;
+import com.airline.airline.exception.EntityNotFoundException;
 import com.airline.airline.service.SeatService;
+import com.airline.airline.util.ResponseUtil;
 
 @RestController
 @RequestMapping("/seat")
@@ -31,31 +33,34 @@ public class SeatController {
     @PostMapping
     public ResponseEntity<ApiResponse<List<Seat>>> createSeats(@Valid @RequestBody SeatRequest request) {
         List<Seat> seats = seatService.createSeats(request);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Seats created successfully", seats));
+        return ResponseUtil.created(seats, "Seats created successfully");
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<Seat>>> getAllSeats() {
         List<Seat> seats = seatService.getAllSeats();
-        return ResponseEntity.ok(new ApiResponse<>(true, "Seats retrieved successfully", seats));
+        return ResponseUtil.ok(seats, "Seats retrieved successfully");
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Seat>> getSeatById(@PathVariable Long id) {
         Seat seat = seatService.getSeatById(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Seat retrieved successfully", seat));
+        if (seat == null) {
+            throw EntityNotFoundException.forId("Seat", id);
+        }
+        return ResponseUtil.ok(seat, "Seat retrieved successfully");
     }
 
     @GetMapping("/aircraft/{aircraftId}")
     public ResponseEntity<ApiResponse<List<Seat>>> getSeatsByAircraft(@PathVariable Long aircraftId) {
         List<Seat> seats = seatService.getSeatsByAircraft(aircraftId);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Seats retrieved successfully", seats));
+        return ResponseUtil.ok(seats, "Seats retrieved successfully");
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteSeat(@PathVariable Long id) {
         seatService.deleteSeat(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Seat deleted successfully", null));
+        return ResponseUtil.noContent("Seat deleted successfully");
     }
 
 }

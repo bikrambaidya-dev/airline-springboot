@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.airline.airline.dto.request.RouteRequest;
 import com.airline.airline.dto.response.ApiResponse;
 import com.airline.airline.entity.Route;
+import com.airline.airline.exception.EntityNotFoundException;
 import com.airline.airline.service.RouteService;
+import com.airline.airline.util.ResponseUtil;
 
 @RestController
 @RequestMapping("/route")
@@ -32,31 +34,37 @@ public class RouteController {
     @PostMapping
     public ResponseEntity<ApiResponse<Route>> createRoute(@Valid @RequestBody RouteRequest request) {
         Route created = routeService.createRoute(request);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Route created successfully", created));
+        return ResponseUtil.created(created, "Route created successfully");
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<Route>>> getAllRoutes() {
         List<Route> routes = routeService.getAllRoutes();
-        return ResponseEntity.ok(new ApiResponse<>(true, "Routes retrieved successfully", routes));
+        return ResponseUtil.ok(routes, "Routes retrieved successfully");
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Route>> getRouteById(@PathVariable Long id) {
         Route route = routeService.getRouteById(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Route retrieved successfully", route));
+        if (route == null) {
+            throw EntityNotFoundException.forId("Route", id);
+        }
+        return ResponseUtil.ok(route, "Route retrieved successfully");
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Route>> updateRoute(@PathVariable Long id, @Valid @RequestBody RouteRequest request) {
         Route updated = routeService.updateRoute(id, request);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Route updated successfully", updated));
+        if (updated == null) {
+            throw EntityNotFoundException.forId("Route", id);
+        }
+        return ResponseUtil.ok(updated, "Route updated successfully");
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteRoute(@PathVariable Long id) {
         routeService.deleteRoute(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Route deleted successfully", null));
+        return ResponseUtil.noContent("Route deleted successfully");
     }
 
 }

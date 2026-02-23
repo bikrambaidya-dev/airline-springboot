@@ -16,6 +16,7 @@ import com.airline.airline.dto.request.AirportRequest;
 import com.airline.airline.dto.response.AirportResponse;
 import com.airline.airline.dto.response.ApiResponse;
 import com.airline.airline.service.AirportService;
+import com.airline.airline.util.ResponseUtil;
 
 @RestController
 @RequestMapping("/airport")
@@ -30,26 +31,19 @@ public class AirportController {
     @PostMapping()
     public ResponseEntity<ApiResponse<AirportResponse>> addAirport(
             @Valid @RequestBody AirportRequest req) {
-
         AirportResponse response = airportService.addAirport(req);
-
-        ApiResponse<AirportResponse> apiResponse =
-                new ApiResponse<>(true, "Airport added successfully", response);
-
-        return ResponseEntity.ok(apiResponse);
+        return ResponseUtil.created(response, "Airport added successfully");
     }
 
     @GetMapping()
     public ResponseEntity<ApiResponse<List<AirportResponse>>> getAllAirports() {
         List<AirportResponse> airports = airportService.getAllAirports();
-        ApiResponse<List<AirportResponse>> apiResponse = new ApiResponse<>(true, "Airports retrieved successfully", airports);
-        return ResponseEntity.ok(apiResponse);
+        return ResponseUtil.ok(airports, "Airports retrieved successfully");
     }
 
     @PutMapping()
     public ResponseEntity<ApiResponse<AirportResponse>> updateAirport(@Valid @RequestBody AirportRequest req){
         AirportResponse response = airportService.updateAirport(req);
-        ApiResponse<AirportResponse> apiResponse = new ApiResponse<>(true, "Airport updated successfully", response);
-        return ResponseEntity.ok(apiResponse);
+        return ResponseUtil.ok(response, "Airport updated successfully");
     }
 }

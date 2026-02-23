@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.airline.airline.dto.request.AircraftRequest;
 import com.airline.airline.dto.response.ApiResponse;
 import com.airline.airline.entity.Aircraft;
+import com.airline.airline.exception.EntityNotFoundException;
 import com.airline.airline.service.AircraftService;
+import com.airline.airline.util.ResponseUtil;
 
 @RestController
 @RequestMapping("/aircraft")    
@@ -31,31 +33,37 @@ public class AircraftController {
     @PostMapping()
     public ResponseEntity<ApiResponse<Aircraft>> createAircraft(@Valid @RequestBody AircraftRequest request) {
         Aircraft created = aircraftService.createAircraft(request);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Aircraft created successfully", created));
+        return ResponseUtil.created(created, "Aircraft created successfully");
     }
 
     @GetMapping()
     public ResponseEntity<ApiResponse<List<Aircraft>>> getAllAircrafts() {
         List<Aircraft> aircrafts = aircraftService.getAllAircrafts();
-        return ResponseEntity.ok(new ApiResponse<>(true, "Aircrafts retrieved successfully", aircrafts));
+        return ResponseUtil.ok(aircrafts, "Aircrafts retrieved successfully");
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Aircraft>> getAircraft(@PathVariable Long id) {
         Aircraft aircraft = aircraftService.getAircraft(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Aircraft retrieved successfully", aircraft));
+        if (aircraft == null) {
+            throw EntityNotFoundException.forId("Aircraft", id);
+        }
+        return ResponseUtil.ok(aircraft, "Aircraft retrieved successfully");
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Aircraft>> updateAircraft(@PathVariable Long id, @Valid @RequestBody AircraftRequest request) {
         Aircraft updated = aircraftService.updateAircraft(id, request);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Aircraft updated successfully", updated));
+        if (updated == null) {
+            throw EntityNotFoundException.forId("Aircraft", id);
+        }
+        return ResponseUtil.ok(updated, "Aircraft updated successfully");
     }
     
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteAircraft(@PathVariable Long id) {
         aircraftService.deleteAircraft(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Aircraft deleted successfully", null));
+        return ResponseUtil.noContent("Aircraft deleted successfully");
     }
     
 }
