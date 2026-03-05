@@ -12,6 +12,8 @@ import com.airline.airline.dto.request.LoginRequest;
 import com.airline.airline.dto.request.RegisterRequest;
 import com.airline.airline.dto.response.ApiResponse;
 import com.airline.airline.service.AuthService;
+import com.airline.airline.util.ResponseUtil;
+import com.airline.airline.entity.User;
 
 /**
  * Authentication Controller with standardized response handling
@@ -34,7 +36,8 @@ public class AuthController {
      */
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest request) {
-        return authService.register(request);
+        User user = authService.register(request);
+        return ResponseUtil.created(user, "User registered successfully");
     }
 
     /**

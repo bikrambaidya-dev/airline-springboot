@@ -5,6 +5,7 @@ import java.util.List;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -45,5 +46,11 @@ public class AirportController {
     public ResponseEntity<ApiResponse<AirportResponse>> updateAirport(@Valid @RequestBody AirportRequest req){
         AirportResponse response = airportService.updateAirport(req);
         return ResponseUtil.ok(response, "Airport updated successfully");
+    }
+
+    @DeleteMapping()
+    public ResponseEntity<ApiResponse<Void>> deleteAirport(Long req) {
+        airportService.deleteAirport(req);
+        return ResponseUtil.ok(null, "Airport deleted successfully");
     }
 }

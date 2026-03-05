@@ -94,4 +94,22 @@ public class AirportService {
         Airport saved = airportRepository.save(airport);
         return toResponse(saved);
     }
+
+    @Transactional
+    public void deleteAirport(Long id) {
+        if (id == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Airport id is required");
+        }
+
+        boolean exists = airportRepository.existsById(id);
+        if (!exists) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Airport not found");
+        }
+
+        airportRepository.deleteById(id);
+    }
 }

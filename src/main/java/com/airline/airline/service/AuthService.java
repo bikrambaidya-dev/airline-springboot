@@ -1,48 +1,62 @@
 package com.airline.airline.service;
+
 import java.util.Optional;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.airline.airline.config.JwtUtil;
 import com.airline.airline.dto.request.LoginRequest;
 import com.airline.airline.dto.request.RegisterRequest;
 import com.airline.airline.dto.response.LoginResponse;
 import com.airline.airline.entity.User;
+import com.airline.airline.producer.NotificationProducer;
+import com.airline.airline.event.UserRegisteredEvent;
 import com.airline.airline.repository.UserRepository;
 import com.airline.airline.util.ResponseUtil;
 
 @Service
 public class AuthService {
 
+    private final NotificationProducer notificationProducer;
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService, NotificationProducer notificationProducer) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.notificationProducer = notificationProducer;
     }
 
-    public ResponseEntity<?> register(RegisterRequest user) {
-        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
-        if (existingUser.isPresent()) {
-            return ResponseUtil.error("User already exists");
+    public User register(RegisterRequest request) {
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+              throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "User already exists");
         }
-        User newUser = new User();
-        newUser.setName(user.getName());
-        newUser.setEmail(user.getEmail());
-        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        newUser.setPhone(user.getPhone());
-        newUser.setRole(User.Role.USER);
-        newUser.setStatus(User.Status.ACTIVE);
-        userRepository.save(newUser);
 
-        // ✅ Generate JWT verification token
-        String token = JwtUtil.generateToken(user.getEmail());
-        emailService.sendVerificationEmail(user.getEmail(), token);
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPhone(request.getPhone());
+        user.setRole(User.Role.USER);
+        user.setStatus(User.Status.ACTIVE);
 
-        return ResponseUtil.created(newUser, "User registered successfully");
+        User savedUser = userRepository.save(user);
+
+        // Publish event instead of direct email
+        UserRegisteredEvent event = new UserRegisteredEvent(savedUser.getEmail(), savedUser.getName());
+        notificationProducer.publishUserRegisteredEvent(event);
+
+        return savedUser;
     }
 
     public ResponseEntity<?> login(LoginRequest user) {
