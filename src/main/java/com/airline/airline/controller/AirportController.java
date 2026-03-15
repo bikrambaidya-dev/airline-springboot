@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.airline.airline.dto.request.AirportRequest;
 import com.airline.airline.dto.response.AirportResponse;
@@ -42,15 +43,18 @@ public class AirportController {
         return ResponseUtil.ok(airports, "Airports retrieved successfully");
     }
 
-    @PutMapping()
-    public ResponseEntity<ApiResponse<AirportResponse>> updateAirport(@Valid @RequestBody AirportRequest req){
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<AirportResponse>> updateAirport(
+            @PathVariable Long id,
+            @Valid @RequestBody AirportRequest req) {
+        req.setId(id);
         AirportResponse response = airportService.updateAirport(req);
         return ResponseUtil.ok(response, "Airport updated successfully");
     }
 
-    @DeleteMapping()
-    public ResponseEntity<ApiResponse<Void>> deleteAirport(Long req) {
-        airportService.deleteAirport(req);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteAirport(@PathVariable Long id) {
+        airportService.deleteAirport(id);
         return ResponseUtil.ok(null, "Airport deleted successfully");
     }
 }

@@ -32,7 +32,7 @@ services:
       MYSQL_PASSWORD: airline_pass
       MYSQL_ROOT_PASSWORD: rootpass
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -54,7 +54,7 @@ services:
       DB_USERNAME: airline_user
       DB_PASSWORD: airline_pass2
       PORT: 8080
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     ports:
       - "8080:8080"
 

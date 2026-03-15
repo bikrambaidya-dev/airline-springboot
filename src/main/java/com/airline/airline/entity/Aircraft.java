@@ -1,5 +1,6 @@
 package com.airline.airline.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,7 +11,8 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "aircraft")
-@Getter @Setter
+@Getter
+@Setter
 public class Aircraft {
 
     @Id
@@ -18,5 +20,9 @@ public class Aircraft {
     private Long id;
 
     private String model;
+    private String manufacturer;
+    @Column(name = "range_km")
+    private String range;
+
     private Integer totalSeats;
 }

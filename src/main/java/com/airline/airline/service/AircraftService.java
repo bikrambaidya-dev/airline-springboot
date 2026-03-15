@@ -24,6 +24,8 @@ public class AircraftService {
         Aircraft aircraft = new Aircraft();
         aircraft.setModel(req.getModel());
         aircraft.setTotalSeats(req.getTotalSeats());
+        aircraft.setManufacturer(req.getManufacturer());
+        aircraft.setRange(req.getRange());
         return aircraftRepository.save(aircraft);
     }
 
@@ -45,6 +47,9 @@ public class AircraftService {
         Aircraft aircraft = getAircraft(id);
         aircraft.setModel(request.getModel());
         aircraft.setTotalSeats(request.getTotalSeats());
+        aircraft.setManufacturer(request.getManufacturer());
+        aircraft.setRange(request.getRange());
+
         return aircraftRepository.save(aircraft);
     }
 
